@@ -25,7 +25,7 @@
         <img src="{{ url('design/adminlte') }}/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
       </div>
       <div class="pull-left info">
-        {{--  <p>{{ admin()->user()->name }}</p>  --}}
+        <p>{{ admin()->user()->name }}</p>
         <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
       </div>
     </div>
@@ -41,81 +41,17 @@
     </form>
     <!-- /.search form -->
     <!-- sidebar menu: : style can be found in sidebar.less -->
-    <ul class="sidebar-menu" data-widget="tree">
-      <li class="header"></li>
+<ul class="sidebar-menu" data-widget="tree">
+  <li class="header"></li>
+   <li><a href="{{ route('home') }}"><i class="fa fa-list"></i><span>@lang('site.dashboard')</span></a></li>
+   @if(admin()->user()->hasPermission('admins_read'))
+       <li><a href="{{ route('admins.index') }}"><i class="fa fa-users"></i><span>@lang('site.admins')</span></a></li>
+   @endif
 
-      <li class="treeview {{ active_menu('')[0] }}">
-        <a href="#">
-          <i class="fa fa-list"></i> <span>{{ trans('admin.dashboard') }}</span>
-          <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-          </span>
-        </a>
-        <ul class="treeview-menu" style="{{ active_menu('admin')[1] }}">
-          <li class=""><a href="{{ aurl('dashboard') }}">
-            <i class="fa fa-cog"></i> <span>{{ trans('admin.dashboard') }}</span>
-            <span class="pull-right-container">
-            </span>
-          </a>
-        </li>
-        <li class=""><a href="{{ aurl('settings') }}">
-          <i class="fa fa-cog"></i> <span>{{ trans('admin.settings') }}</span>
-          <span class="pull-right-container">
-          </span>
-        </a>
-      </li>
-    </ul>
-  </li>
-  <li class="treeview {{ active_menu('admin')[0] }}">
-    <a href="#">
-      <i class="fa fa-users"></i> <span>{{ trans('admin.admin') }}</span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>
-    <ul class="treeview-menu" style="{{ active_menu('admin')[1] }}">
-      <li class=""><a href="{{ aurl('admin') }}"><i class="fa fa-users"></i> {{ trans('admin.admin') }}</a></li>
-    </ul>
-  </li>
-  <li class="treeview {{ active_menu('users')[0] }}">
-    <a href="#">
-      <i class="fa fa-users"></i> <span>{{ trans('admin.users') }}</span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>
-    <ul class="treeview-menu" style="{{ active_menu('users')[1] }}">
-      <li class=""><a href="{{ aurl('users') }}"><i class="fa fa-users"></i> {{ trans('admin.users') }}</a></li>
-      <li class=""><a href="{{ aurl('users') }}?level=user"><i class="fa fa-users"></i> {{ trans('admin.user') }}</a></li>
-      <li class=""><a href="{{ aurl('users') }}?level=vendor"><i class="fa fa-users"></i> {{ trans('admin.vendor') }}</a></li>
-      <li class=""><a href="{{ aurl('users') }}?level=company"><i class="fa fa-users"></i> {{ trans('admin.company') }}</a></li>
-    </ul>
-  </li>
-   <li class="treeview {{ active_menu('countries')[0] }}">
-    <a href="#">
-      <i class="fa fa-flag"></i> <span>{{ trans('admin.countries') }}</span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>
-    <ul class="treeview-menu" style="{{ active_menu('countries')[1] }}">
-      <li class=""><a href="{{ aurl('countries') }}"><i class="fa fa-flag"></i> {{ trans('admin.countries') }}</a></li>
-      <li class=""><a href="{{ aurl('countries/create') }}"><i class="fa fa-plus"></i> {{ trans('admin.add') }}</a></li>
-    </ul>
-  </li>
+   <li><a href="{{ route('countries.index') }}"><i class="fa fa-list"></i><span>@lang('site.countries')</span></a></li>
 
-  <li class="treeview {{ active_menu('cities')[0] }}">
-    <a href="#">
-      <i class="fa fa-flag"></i> <span>{{ trans('admin.cities') }}</span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>
-    <ul class="treeview-menu" style="{{ active_menu('cities')[1] }}">
-      <li class=""><a href="{{ aurl('cities') }}"><i class="fa fa-flag"></i> {{ trans('admin.cities') }}</a></li>
-      <li class=""><a href="{{ aurl('cities/create') }}"><i class="fa fa-plus"></i> {{ trans('admin.add') }}</a></li>
-    </ul>
-  </li>
+   {{--  <li><a href="{{ url('dashboard/admins') }}"><i class="fa fa-users"></i><span>@lang('site.admins')</span></a></li>  --}}
+
 
 
 

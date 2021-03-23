@@ -10,8 +10,8 @@ class CategoryController extends Controller
 {
     public function categories()
     {
-        $categories = Category::where('parent','=',0)->paginate(); // all categories
-         //$categories = Category::get()->where('parent','=',0); // all categories
+        //$categories = Category::where('parent','=',0)->paginate(); // all categories
+         $categories = Category::get()->where('parent','=',0); // all categories
         //$categories = Category::get()->whereNotNull('parent');
        //$categories = Category::paginate()->where( 'parent ', '=', 'null' )->get();
 

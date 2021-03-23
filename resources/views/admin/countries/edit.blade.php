@@ -1,58 +1,56 @@
 @extends('admin.index')
 @section('content')
 
+<section class="content-header">
 
-<div class="box">
   <div class="box-header">
-    <h3 class="box-title">{{ $title }}</h3>
+      <h3 class="box-title">{{ $title }}</h3>
   </div>
-  <!-- /.box-header -->
-  <div class="box-body">
-    {!! Form::open(['url'=>aurl('countries/'.$country->id),'method'=>'put','files'=>true ]) !!}
-   <div class="form-group">
-        {!! Form::label('country_name_ar',trans('admin.country_name_ar')) !!}
-        {!! Form::text('country_name_ar',$country->country_name_ar,['class'=>'form-control']) !!}
-     </div>
 
-     <div class="form-group">
-        {!! Form::label('country_name_en',trans('admin.country_name_en')) !!}
-        {!! Form::text('country_name_en',$country->country_name_en,['class'=>'form-control']) !!}
-     </div>
+  <ol class="breadcrumb">
+    <li><a href="{{ route('home') }}"><i class="fa fa-dashboard"></i> @lang('site.dashboard')</a></li>
+    <li><a href="{{ route('countries.index') }}"> @lang('site.countries')</a></li>
+    <li class="active">@lang('site.edit')</li>
+  </ol>
 
-     <div class="form-group">
-        {!! Form::label('code',trans('admin.code')) !!}
-        {!! Form::text('code',$country->code,['class'=>'form-control']) !!}
-     </div>
+</section>
 
-     <div class="form-group">
-        {!! Form::label('mob',trans('admin.mob')) !!}
-        {!! Form::text('mob',$country->mob,['class'=>'form-control']) !!}
-     </div>
-     
-     <div class="form-group">
-        {!! Form::label('currency',trans('admin.currency')) !!}
-        {!! Form::text('currency',$country->currency,['class'=>'form-control']) !!}
-     </div>
+<section class="content">
+    <div class="box box-primary">
 
-     <div class="form-group">
-        {!! Form::label('logo',trans('admin.country_flag')) !!}
-        {!! Form::file('logo',['class'=>'form-control']) !!}
+      <div class="box-header">
+          <h3 class="box-title">@lang('site.edit')</h3>
+      </div><!-- end of header -->
 
-          @if(!empty($country->logo))
-       <img src="{{ Storage::url($country->logo) }}" style="width:50px;height: 50px;" />
-      @endif
+      <div class="box-body">
 
-     </div>
+          <form action="{{ route('countries.update', $country->id) }}" method="post">
+            {{ csrf_field() }}
+            {{ method_field('put') }}
 
+            @foreach(config('translatable.locales') as $locale)
+               <div class="col-6 col-xs-12">
+                 <div class="form-group">
+                    <label for="{{$locale}}.country_name">@lang('site.' . $locale. '.country_name')</label>
+                     <input type="text" id="{{$locale}}.country_name" name="{{$locale}}[country_name]"
+                        class="form-control"
+                        placeholder="@lang('site.' . $locale . '.country_name')"
+                        value="{{ $country->translate($locale)->country_name }}">
+                  </div>
+               </div>
+            @endforeach
 
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary"><i class="fa fa-edit"></i> @lang('site.edit')</button>
+                
+            </div>
 
-     {!! Form::submit(trans('admin.save'),['class'=>'btn btn-primary']) !!}
-    {!! Form::close() !!}
-  </div>
-  <!-- /.box-body -->
-</div>
-<!-- /.box -->
+          </form><!-- end of form -->
 
+      </div>
 
+    </div> <!-- end of box -->
+
+</section><!-- end of content -->
 
 @endsection

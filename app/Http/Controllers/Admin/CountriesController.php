@@ -1,11 +1,9 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\DataTables\CountryDatatable;
+use App\Country;
 use App\Http\Controllers\Controller;
-use App\Model\Country;
 use Illuminate\Http\Request;
-use Storage;
 
 class CountriesController extends Controller
 {
@@ -14,10 +12,12 @@ class CountriesController extends Controller
     *
     * @return \Illuminate\Http\Response
     */
-   public function index(CountryDatatable $country)
+   public function index(Country $countries)
    {
-      return $country->render('admin.countries.index', ['title' => trans('admin.countries')]);
-   }
+      $countries = Country::all();
+      return view('admin.countries.index')->with('title',__('site.countries'))->with('countries', $countries);
+      //return $country->render('admin.countries.index', ['title' => trans('admin.countries')]);
+   } // end of index
 
    /**
     * Show the form for creating a new resource.
@@ -27,7 +27,7 @@ class CountriesController extends Controller
    public function create()
    {
       return view('admin.countries.create', ['title' => trans('admin.create_countries')]);
-   }
+   } // end of create
 
    /**
     * Store a newly created resource in storage.
@@ -35,50 +35,24 @@ class CountriesController extends Controller
     * @param  \Illuminate\Http\Request  $request
     * @return \Illuminate\Http\Response
     */
-   public function store()
+   public function store(Request $request)
    {
 
-      $data = $this->validate(request(),
-         [
-            'country_name_ar' => 'required',
-            'country_name_en' => 'required',
-            'mob'             => 'required',
-            'code'            => 'required',
-            'currency'        => 'required',
-            'logo'            => 'sometimes|nullable|' . v_image(),
-         ], [], [
-            'country_name_ar' => trans('admin.country_name_ar'),
-            'country_name_en' => trans('admin.country_name_en'),
-            'mob'             => trans('admin.mob'),
-            'code'            => trans('admin.code'),
-            'currency'        => trans('admin.currency'),
-            'logo'            => trans('admin.country_flag'),
-         ]);
+       $data = [];
+       foreach (config('translatable.locales') as $one_lang) {
+           $data += [$one_lang.'.country_name' => 'required|min:2|max:100'];
+       }
+       $data_request =$request->validate($data);
 
-      if (request()->hasFile('logo')) {
-         $data['logo'] = up()->upload([
-            'file'        => 'logo',
-            'path'        => 'countries',
-            'upload_type' => 'single',
-            'delete_file' => '',
-         ]);
-      }
+       Country::create($data_request);
 
-      Country::create($data);
-      session()->flash('success', trans('admin.record_added'));
-      return redirect(aurl('countries'));
-   }
+        session()->flash('success',__('site.added_successfully'));
+        //return redirect()->view('admin.admins.index');
+        return redirect()->route('countries.index');
+        //return redirect(url('dashboard/countries'));
+     
+   } // end of store
 
-   /**
-    * Display the specified resource.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-   public function show($id)
-   {
-      //
-   }
 
    /**
     * Show the form for editing the specified resource.
@@ -86,12 +60,11 @@ class CountriesController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function edit($id)
+   public function edit(Country $country)
    {
-      $country = Country::find($id);
-      $title   = trans('admin.edit');
+      $title   = trans('site.edit');
       return view('admin.countries.edit', compact('country', 'title'));
-   }
+   } // end of edit 
 
    /**
     * Update the specified resource in storage.
@@ -100,39 +73,21 @@ class CountriesController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function update(Request $r, $id)
+   public function update(Request $request, Country $country)
    {
+        $data = [];
+        foreach (config('translatable.locales') as $one_lang) {
+            $data += [$one_lang.'.country_name' => 'required|min:2|max:100'];
+        }
+        $data_request =$request->validate($data);
 
-      $data = $this->validate(request(),
-         [
-            'country_name_ar' => 'required',
-            'country_name_en' => 'required',
-            'mob'             => 'required',
-            'code'            => 'required',
-            'currency'        => 'required',
-            'logo'            => 'sometimes|nullable|' . v_image(),
-         ], [], [
-            'country_name_ar' => trans('admin.country_name_ar'),
-            'country_name_en' => trans('admin.country_name_en'),
-            'mob'             => trans('admin.mob'),
-            'code'            => trans('admin.code'),
-            'currency'        => trans('admin.currency'),
-            'logo'            => trans('admin.logo'),
-         ]);
+        $country->update($data_request);
 
-      if (request()->hasFile('logo')) {
-         $data['logo'] = up()->upload([
-            'file'        => 'logo',
-            'path'        => 'countries',
-            'upload_type' => 'single',
-            'delete_file' => Country::find($id)->logo,
-         ]);
-      }
-
-      Country::where('id', $id)->update($data);
-      session()->flash('success', trans('admin.updated_record'));
-      return redirect(aurl('countries'));
-   }
+        session()->flash('success',__('site.updated_successfully'));
+        //return redirect()->view('admin.admins.index');
+        //return redirect()->route('countries.index');
+        return redirect(url('dashboard/countries'));
+   } // end of update
 
    /**
     * Remove the specified resource from storage.
@@ -140,29 +95,16 @@ class CountriesController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function destroy($id)
+   public function destroy(Country $country)
    {
-      $countries = Country::find($id);
-      Storage::delete($countries->logo);
-      $countries->delete();
-      session()->flash('success', trans('admin.deleted_record'));
-      return redirect(aurl('countries'));
-   }
+      
+        //Country::find($id)->delete();
+        $country->delete();
+        session()->flash('success', __('site.deleted_successfully'));
+        return redirect(url('dashboard/countries'));
+        //session()->flash('success', trans('admin.deleted_record'));
 
-   public function multi_delete()
-   {
-      if (is_array(request('item'))) {
-         foreach (request('item') as $id) {
-            $countries = Country::find($id);
-            Storage::delete($countries->logo);
-            $countries->delete();
-         }
-      } else {
-         $countries = Country::find(request('item'));
-         Storage::delete($countries->logo);
-         $countries->delete();
-      }
-      session()->flash('success', trans('admin.deleted_record'));
-      return redirect(aurl('countries'));
-   }
-}
+   } // end of delete
+
+
+} // end of controller

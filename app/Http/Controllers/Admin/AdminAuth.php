@@ -13,7 +13,7 @@ class AdminAuth extends Controller
     public function login() {
         return view('admin.login');
 
-    }
+    } // end of login
 
     public function dologin() {
         //check email and password
@@ -27,14 +27,14 @@ class AdminAuth extends Controller
             //return redirect(aurl('login'));
         }
 
-    }
+    } // end of dologin
 
     public function logout() {
         admin()->logout();
         return redirect('dashboard/login');
 
-    }
+    } // end of logout
 
 
    
-}
+} // end of controller

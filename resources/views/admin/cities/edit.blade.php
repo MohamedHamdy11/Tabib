@@ -4,13 +4,14 @@
   <div class="box-header">
     <h3 class="box-title">{{ $title }}</h3>
   </div>
-  <!-- /.box-header --> 
+  <!-- /.box-header -->
   <div class="box-body">
     {!! Form::open(['url'=>aurl('cities/'.$country->id),'method'=>'put' ]) !!}
     <div class="form-group">
       {!! Form::label('city_name_ar',trans('admin.city_name_ar')) !!}
       {!! Form::text('city_name_ar',$country->city_name_ar,['class'=>'form-control']) !!}
     </div>
+
     <div class="form-group">
       {!! Form::label('city_name_en',trans('admin.city_name_en')) !!}
       {!! Form::text('city_name_en',$country->city_name_en,['class'=>'form-control']) !!}

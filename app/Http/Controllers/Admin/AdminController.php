@@ -1,22 +1,22 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
-use App\DataTables\AdminDatatable;
-use Illuminate\Http\Request;
+
 use App\Admin;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(AdminDatatable $admin)
+    // Display a listing of the resource.
+    public function index(Admin $admins)
     {
-        return $admin->render('admin.admins.index', ['title' => 'Admin Control']);
-    }
+        $admins = Admin::all();
+        //return view('admin.admins.index', compact('admins'));
+        return view('admin.admins.index')->with('title',trans('site.admins'))->with('admins',$admins);
+
+    } // end of index
+
 
     /**
      * Show the form for creating a new resource.
@@ -25,7 +25,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-       return view('admin.admins.create',['title'=>trans('admin.create_admin')]);
+        return view('admin.admins.create')->with('title',trans('site.create_admins'));
     }
 
     /**
@@ -36,99 +36,84 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //return request();
-        $data = $this->validate(request(),
-        [
-            'name'    => 'required',
+        //dd($request->all());
+        $request->validate([
+            'name'  => 'required',
             'email'   => 'required|email|unique:admins',
-            'password'=> 'required|min:6'
-        ], [], [
-            'name'    => trans('admin.name'),
-            'email'   => trans('admin.email'),
-            'password'=> trans('admin.password'),
+            'password'=> 'required|confirmed|min:6',
         ]);
-        $data['password'] = bcrypt(request('password'));
-        Admin::create($data);
-        session()->flash('success', trans('admin.record_added'));
-        return redirect(aurl('admin'));
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        $request_data = $request->except(['password', 'password_confirmtion', 'permissions']);
+        $request_data['password'] = bcrypt($request->password);
+
+        $admin = Admin::create($request_data);
+        $admin->attachRole('admin');
+        $admin->syncPermissions($request->permissions);
+
+        session()->flash('success',__('site.added_successfully'));
+        //return redirect()->view('admin.admins.index');
+        //return redirect()->route('admins.index');
+        return redirect(url('dashboard/admins'));
+
+
+    } // end of store
+
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Admin  $admin
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Admin $admin)
     {
-        $admin = Admin::find($id);
         $title = trans('admin.edit');
         return view('admin.admins.edit', compact('admin', 'title'));
-    }
+
+    } // end of edit
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Admin  $admin
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Admin $admin)
     {
-        $data = $this->validate(request(),
-        [
-            'name'    => 'required',
-            'email'   => 'required|email|unique:admins,email,'.$id,
-            'password'=> 'sometimes|nullable|min:6'
-        ], [], [
-            'name'    => trans('admin.name'),
-            'email'   => trans('admin.email'),
-            'password'=> trans('admin.password'),
+        $request->validate([
+            'name'  => 'required',
+            'email'   => 'required|email|unique:admins,email,'.$admin->id,
+            'password'=> 'required|confirmed|min:6',
         ]);
-        if (request()->has('password')) {
-            $data['password'] = bcrypt(request('password'));
-        }
-        Admin::where('id', $id)->update($data);
-        session()->flash('success', trans('admin.updated_record'));
-        return redirect(aurl('admin'));
-    }
+
+        $request_data = $request->except(['password', 'password_confirmtion', 'permissions']);
+        $request_data['password'] = bcrypt($request->password);
+
+        $admin->update($request_data);
+        $admin->syncPermissions($request->input('permission'));
+
+        session()->flash('success',__('site.updated_successfully'));
+        return redirect(url('dashboard/admins'));
+        //return redirect()->view('admin.admins.index');
+       // return redirect()->route('admins.index');
+
+    } // end of update
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Admin  $admin
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Admin $admin)
     {
-        Admin::find($id)->delete();
-        session()->flash('success', trans('admin.deleted_record'));
-        return redirect(aurl('admin'));
-    }
+        //Admin::find($id)->delete();
+        $admin->delete();
+        session()->flash('success', __('site.deleted_successfully'));
+        return redirect(url('dashboard/admins'));
+        //session()->flash('success', trans('admin.deleted_record'));
 
+    } // end of destroy
 
-    public function multi_delete() {
-        //dd(request('item'));
-        //return request();
-        if(is_array(request('item')))
-        {
-            Admin::destroy(request('item'));
-        } else{
-            Admin::find(request('item'))->delete();
-        }
-        session()->flash('success', trans('admin.deleted_record'));
-        return redirect(aurl('admin'));
-    }
-
-}
+} // end of controller

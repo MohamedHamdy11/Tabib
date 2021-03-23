@@ -13,7 +13,7 @@ class Country extends Model implements TranslatableContract
     public $translatedAttributes = ['country_name'];
 
 
-    protected $table   = 'countries';
+    //protected $table   = 'countries';
 	protected $guarded = []; //this is return all column
 
 }

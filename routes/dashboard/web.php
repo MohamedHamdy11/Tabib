@@ -13,17 +13,24 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['lo
             Route::post('logout','AdminAuth@logout')->name('logout');
 
 
-            Route::group(['middleware' => 'admin:admin'], function () {
+            Route::group(['middleware' => 'admin:admin'], function () { 
+                 // admin routes
+                Route::resource('admins', 'AdminController')->except(['show']);
+               
+                 // country route
+                Route::resource('countries', 'CountriesController')->except(['show']);
+
+
+                
                 Route::get('/', function () {
                     return view('admin.home');
-                });
+                })->name('home');
 
-                Route::resource('admin', 'AdminController');
-                Route::delete('admin/destroy/all', 'AdminController@multi_delete');
 
-                Route::get('index', function () {
-                    return view('admin.index');
-                })->name('welcome');
+
+                // Route::get('index', function () {
+                //     return view('admin.index');
+                // })->name('index');
 
 
             }); //end of middleware
